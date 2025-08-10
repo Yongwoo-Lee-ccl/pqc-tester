@@ -1,5 +1,5 @@
 
-# sec-framework
+# pqc-tester
 
 A single front-end that routes one input spec to either
 - **CAT** (code-based crypto attack analysis), or
@@ -10,7 +10,7 @@ It normalizes outputs into a common schema (`log2_cost`, `success_prob`, etc.).
 ## Layout
 
 ```
-sec-framework/
+pqc-tester/
   adapters/               # Adapters for each backend
   core/                   # Shared models, router, normalizers
   runners/                # External tool runners

@@ -1,4 +1,3 @@
-
 import math
 from typing import Dict, Tuple, Optional
 
@@ -12,6 +11,10 @@ def _best(attacks: Dict[str, dict]) -> Tuple[Optional[str], Optional[dict]]:
     return best_name, best
 
 def normalize_lwe(raw: dict):
+    for name, attack in raw.get("attacks", {}).items():
+        if "rop" in attack and attack["rop"] > 0:
+            attack["log2_cost"] = math.log2(float(attack["rop"]))
+
     name, a = _best(raw.get("attacks", {}))
     if not a:
         raise ValueError("No attack with 'rop' found in lattice-estimator output")
@@ -28,6 +31,10 @@ def normalize_lwe(raw: dict):
     }
 
 def normalize_cat(raw: dict):
+    for name, attack in raw.get("attacks", {}).items():
+        if "rop" in attack and attack["rop"] > 0:
+            attack["log2_cost"] = math.log2(float(attack["rop"]))
+
     name, a = _best(raw.get("attacks", {}))
     if not a:
         raise ValueError("No attack with 'rop' found in CAT output")

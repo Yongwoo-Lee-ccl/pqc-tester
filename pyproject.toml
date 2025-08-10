@@ -1,6 +1,6 @@
 
 [project]
-name = "sec-framework"
+name = "pqc-tester"
 version = "0.1.0"
 description = "Unified security estimator wrapper for code- and lattice-based crypto (CAT + lattice-estimator)"
 requires-python = ">=3.10"
