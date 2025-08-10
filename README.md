@@ -1,4 +1,3 @@
-
 # pqc-tester
 
 A single front-end that routes one input spec to either
@@ -33,19 +32,20 @@ git submodule add https://github.com/malb/lattice-estimator vendors/lattice-esti
 git submodule update --init --recursive
 ```
 
-> Note: CAT integration code (`runners/cat_runner.py`) is a placeholder. Replace with CAT's actual CLI invocation and parsing logic when available.
-> `runners/sage_runner.py` expects `sage` in PATH and `LATTICE_ESTIMATOR_PATH` pointing to `vendors/lattice-estimator` (default already points there).
+`runners/sage_runner.py` expects `sage` in PATH and `LATTICE_ESTIMATOR_PATH` pointing to `vendors/lattice-estimator` (default already points there).
 
 ## Presets
 
 - `presets/kyber512.json` — Kyber-512 (128-bit security target). Routed to lattice estimator (as MLWE, crudely mapped to LWE for now).
-- `presets/hqc128.json` — HQC-128. Routed to CAT (placeholder behavior in current mock).
+- `presets/hqc128.json` — HQC-128. Routed to CAT.
+- `presets/mceliece348864.json` — Classic McEliece 348864. Routed to CAT.
 
 ## Usage
 
 ```bash
 python cli.py presets/kyber512.json
 python cli.py presets/hqc128.json
+python cli.py presets/mceliece348864.json
 ```
 
 The CLI prints a normalized JSON with the best attack and `log2_cost`.
@@ -54,11 +54,10 @@ The CLI prints a normalized JSON with the best attack and `log2_cost`.
 
 - Python 3.10+
 - For lattice back-end: SageMath + `vendors/lattice-estimator`
-- For code-based back-end: CAT. Update `runners/cat_runner.py` to actually call CAT.
+- For code-based back-end: CAT (`CAT_BIN` may override the CLI path; defaults to `vendors/cat/cat.py`).
 
 ## Roadmap
 
 - Proper MLWE→LWE mapping with exact Kyber noise parameters.
 - Richer attack set selection and model flags.
 - Dockerized runners for strict reproducibility.
-- CAT real runner implementation and output parser.

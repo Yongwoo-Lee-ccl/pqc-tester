@@ -1,0 +1,14 @@
+{
+  "kind": "code",
+  "label": "Classic McEliece 348864",
+  "params": {
+    "code_family": "mceliece",
+    "n": 3488,
+    "k": 2720,
+    "t": 64,
+    "pk_bytes": 261120,
+    "sk_bytes": 6492,
+    "ct_bytes": 128,
+    "target_dfp": "2^-128"
+  }
+}
