@@ -1,0 +1,9 @@
+{
+    "kind": "code",
+    "label": "Code-Tiny",
+    "params": {
+        "n": 64,
+        "k": 32,
+        "t": 3
+    }
+}

@@ -27,17 +27,47 @@ pip install -e .
 ### Bring the vendors
 
 #### CAT (Code Attack Tool)
+
+**Recommended: Docker Setup (Easiest)**
+```bash
+# Build the CAT Docker image
+docker build -f docker/Dockerfile.cat -t pqc-tester-cat .
+
+# Test the Docker image
+echo '{"n": 100, "k": 50, "t": 10}' | docker run --rm -i pqc-tester-cat /dev/stdin
+```
+
+**Alternative: Manual Installation**
 Download and install CAT from https://cat.cr.yp.to/software.html:
 
+**On Ubuntu/Debian:**
 ```bash
+# Install dependencies
+sudo apt-get update
+sudo apt-get install build-essential libgmp-dev python3-dev
+
+# Download and build CAT
 # Visit https://cat.cr.yp.to/software.html to download the latest version
-# Extract to vendors/cat/ directory:
-# tar -xzf cryptattacktester-YYYYMMDD.tar.gz
-# mv cryptattacktester-YYYYMMDD vendors/cat
-# 
-# The framework expects cat.py to be at vendors/cat/cat.py
-# Or set CAT_BIN environment variable to point to your CAT installation
+tar -xzf cryptattacktester-YYYYMMDD.tar.gz
+cd cryptattacktester-YYYYMMDD
+make
+cd ..
+mv cryptattacktester-YYYYMMDD vendors/cat
+
+# Set environment variable to use local installation
+export CAT_BIN="python3 vendors/cat/cat.py"
 ```
+
+**On macOS:**
+```bash
+# Install dependencies via Homebrew
+brew install gmp
+
+# Then follow the Ubuntu build steps above
+# Note: May require additional configuration for GMP paths
+```
+
+By default, the framework uses Docker. Set `CAT_BIN` environment variable to override.
 
 #### Lattice Estimator
 ```bash

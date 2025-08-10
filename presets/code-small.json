@@ -1,0 +1,9 @@
+{
+    "kind": "code",
+    "label": "Code-Small",
+    "params": {
+        "n": 100,
+        "k": 50,
+        "t": 4
+    }
+}
