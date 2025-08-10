@@ -6,6 +6,16 @@ A single front-end that routes one input spec to either
 
 It normalizes outputs into a common schema (`log2_cost`, `success_prob`, etc.).
 
+## ⚠️ Disclaimer
+
+**This code was co-generated with AI tools and may contain errors.** While the implementation has been tested with various parameter sets, users should:
+- **Verify results independently** for critical security assessments
+- **Cross-reference with original tools** (CAT, lattice-estimator) when needed
+- **Report issues** if discrepancies are found between this wrapper and the underlying tools
+- **Use with caution** in production security evaluations
+
+The academic references and mathematical formulations should be considered authoritative over this implementation.
+
 ## Layout
 
 ```
@@ -115,7 +125,23 @@ python cli.py presets/hqc128.json
 python cli.py presets/bike-l1.json
 ```
 
-The CLI prints a normalized JSON with the best attack and `log2_cost`.
+### Parameter Validation
+The CLI automatically validates code-based parameters against **section 4.6 constraints** and warns about potential issues:
+
+```bash
+# Example with parameters that violate section 4.6 constraints
+echo '{"kind": "code", "label": "Test", "params": {"n": 64, "k": 32, "t": 3}}' > test.json
+python cli.py test.json
+
+# Output includes section 4.6 validation warnings:
+# ⚠️  Warning: k=32 violates CAT rate constraint 0.7n ≤ k ≤ 0.8n
+#    Required range: 44.8 ≤ k ≤ 51.2
+# ⚠️  Warning: k=32 doesn't match CAT's structural constraint  
+#    CAT formula: k = n - t⌈log₂(n)⌉ = 64 - 3×6 = 46
+#    CAT will use k=46 instead of your requested k=32
+```
+
+The CLI prints a normalized JSON with the best attack, `log2_cost`, and metadata about parameter adjustments.
 
 ## Environment
 
@@ -128,28 +154,49 @@ The CLI prints a normalized JSON with the best attack and `log2_cost`.
 
 **CAT (Cryptographic Attack Tester)** is a tool by Daniel J. Bernstein for analyzing code-based cryptosystem security. Here's how our integration works:
 
-### Parameter Constraints
-CAT has specific constraints on code parameters:
+### Parameter Constraints & Limitations
+
+CAT has specific mathematical constraints on code parameters as documented in **section 4.6** of the CAT paper:
+
+**Section 4.6 Constraints:**
+1. **Size constraint**: `n ≥ 8`
+2. **Rate constraint**: `0.7n ≤ k ≤ 0.8n` 
+3. **Structural constraint**: `k = n - t⌈log₂(n)⌉`
+
+**How this affects your input:**
 - **Input**: You provide `(n, k, t)` where n=code length, k=info length, t=error weight  
-- **CAT's internal logic**: Uses `(N, K, W)` where `K = N - ceil(log2(N)) * W`
-- **Mapping**: Our wrapper maps your `t → W` and lets CAT calculate its own `K`
+- **CAT's behavior**: Uses your `n` and `t`, but calculates `K = n - t⌈log₂(n)⌉`
+- **Validation**: CLI checks all three constraints and warns about violations
+- **Mapping**: Our wrapper maps `t → W` and lets CAT enforce its constraints
+
+**Important**: Your desired `k` may differ significantly from CAT's calculated `K` due to section 4.6 constraints. The CLI will warn you when parameters will be adjusted.
 
 ### Attack Flow
 1. **`problemparams`**: CAT finds valid `(N,K,W)` combinations for your `N` and `W`
-2. **`searchparams`**: CAT optimizes attack parameters for ISD (Information Set Decoding)  
-3. **`circuitcost`**: CAT estimates the circuit complexity (in ROPs - Random Oracle Primes)
+2. **`searchparams`**: CAT optimizes parameters for each ISD variant (ISD0, ISD1, ISD2)  
+3. **`circuitcost`**: CAT estimates circuit complexity for each attack
+4. **Best selection**: Our wrapper returns the attack with lowest cost (strongest attack)
 
 ### Example
 ```bash
 Input: {"n": 64, "k": 32, "t": 3}
-CAT uses: N=64, K=46, W=3  # K calculated by CAT's formula
-Output: ~12,090 ROPs (2^13.6 complexity)
+CAT tests: ISD0, ISD1, ISD2 variants with N=64, K=46, W=3
+Best attack: ISD1 with ~6,034 ROPs (2^12.6 complexity)
+Output includes: attack name, cost, and metadata about all variants tested
 ```
 
 ### Limitations
-- CAT only supports specific code families (uniformmatrix problem)
-- Your desired `k` may differ from CAT's calculated `K` due to constraints
-- CAT is optimized for research scenarios, not arbitrary parameter sets
+- **Code families**: CAT only supports the "uniformmatrix" problem type (random linear codes)
+- **Parameter flexibility**: Your desired `k` may differ from CAT's calculated `K` due to rate constraints  
+- **Research focus**: CAT is optimized for cryptanalytic research, not arbitrary parameter validation
+- **Attack scope**: Focuses on ISD variants; does not cover all possible code-breaking approaches
+- **Classical security**: Provides classical complexity estimates; quantum impact requires separate analysis
+
+**Academic References**: 
+- **CAT (Code-based cryptanalysis)**: Bernstein, D.J. "cryptattacktester software" (2023). https://cat.cr.yp.to/
+- **Section 4.6 parameter constraints** are documented in the CAT technical specifications
+- The underlying ISD algorithms and complexity analysis are described in the CAT documentation and related papers on code-based cryptanalysis available at https://cat.cr.yp.to/papers.html
+- **Lattice Estimator (Lattice-based cryptanalysis)**: Albrecht, M.R., Player, R., and Scott, S. "On the concrete hardness of Learning with Errors" (2015). Available at https://github.com/malb/lattice-estimator
 
 ## Roadmap
 
