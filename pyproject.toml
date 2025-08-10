@@ -9,5 +9,12 @@ dependencies = [
     "typer>=0.9.0",
 ]
 
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["core*", "runners*", "adapters*", "presets*"]
+
 [project.scripts]
 sec-estimate = "cli:app"

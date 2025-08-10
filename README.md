@@ -44,8 +44,8 @@ git submodule update --init --recursive
 ## Usage
 
 ```bash
-python cli.py estimate presets/kyber512.json
-python cli.py estimate presets/hqc128.json
+python cli.py presets/kyber512.json
+python cli.py presets/hqc128.json
 ```
 
 The CLI prints a normalized JSON with the best attack and `log2_cost`.

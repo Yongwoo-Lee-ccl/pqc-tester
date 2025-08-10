@@ -7,7 +7,7 @@ app = typer.Typer(help="Unified estimator CLI (code-based via CAT, lattice via l
 
 @app.command()
 def estimate(spec_file: str):
-    """Run estimation given an InputSpec JSON file.\"""
+    """Run estimation given an InputSpec JSON file."""
     with open(spec_file, "r") as f:
         payload = json.load(f)
     spec = InputSpec(**payload)
