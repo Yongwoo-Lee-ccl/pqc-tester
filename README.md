@@ -33,8 +33,9 @@ pip install -e .
 # Build the CAT Docker image
 docker build -f docker/Dockerfile.cat -t pqc-tester-cat .
 
-# Test the Docker image
-echo '{"n": 100, "k": 50, "t": 10}' | docker run --rm -i pqc-tester-cat /dev/stdin
+# Test the Docker image with a small example
+echo '{"n": 64, "k": 32, "t": 3}' > /tmp/test.json
+docker run --rm -v /tmp:/tmp pqc-tester-cat /tmp/test.json
 ```
 
 **Alternative: Manual Installation**
@@ -44,15 +45,19 @@ Download and install CAT from https://cat.cr.yp.to/software.html:
 ```bash
 # Install dependencies
 sudo apt-get update
-sudo apt-get install build-essential libgmp-dev python3-dev
+sudo apt-get install build-essential libgmp-dev libmpfi-dev libssl-dev python3-dev
 
 # Download and build CAT
-# Visit https://cat.cr.yp.to/software.html to download the latest version
-tar -xzf cryptattacktester-YYYYMMDD.tar.gz
-cd cryptattacktester-YYYYMMDD
-make
+wget https://cat.cr.yp.to/cryptattacktester-20231020.tar.gz
+tar -xzf cryptattacktester-20231020.tar.gz
+cd cryptattacktester-20231020
+make -j4
+make lib.so
 cd ..
-mv cryptattacktester-YYYYMMDD vendors/cat
+mv cryptattacktester-20231020 vendors/cat
+
+# Copy the wrapper script
+cp docker/cat.py vendors/cat/cat.py
 
 # Set environment variable to use local installation
 export CAT_BIN="python3 vendors/cat/cat.py"
@@ -61,10 +66,10 @@ export CAT_BIN="python3 vendors/cat/cat.py"
 **On macOS:**
 ```bash
 # Install dependencies via Homebrew
-brew install gmp
+brew install gmp mpfi
 
 # Then follow the Ubuntu build steps above
-# Note: May require additional configuration for GMP paths
+# Note: May require additional configuration for library paths
 ```
 
 By default, the framework uses Docker. Set `CAT_BIN` environment variable to override.
@@ -79,16 +84,35 @@ git submodule update --init --recursive
 
 ## Presets
 
-- `presets/kyber512.json` — Kyber-512 (128-bit security target). Routed to lattice estimator (as MLWE, crudely mapped to LWE for now).
-- `presets/hqc128.json` — HQC-128. Routed to CAT.
-- `presets/mceliece348864.json` — Classic McEliece 348864. Routed to CAT.
+### Code-based Schemes (routed to CAT)
+- `presets/test-tiny.json` — Small test case: (64,32,3) for fast testing
+- `presets/test-small.json` — Small test case: (100,50,4) for fast testing  
+- `presets/bike-l1.json` — BIKE Level 1 parameters
+- `presets/hqc128.json` — HQC-128
+- `presets/mceliece348864.json` — Classic McEliece 348864
+- `presets/lightsaber.json` — Lightsaber parameters
+- `presets/saber.json` — Saber parameters
+- `presets/firesaber.json` — FireSaber parameters
+
+### Lattice-based Schemes (routed to lattice-estimator)  
+- `presets/kyber512.json` — Kyber-512 (128-bit security target)
+- `presets/kyber768.json` — Kyber-768 (192-bit security target)
+- `presets/kyber1024.json` — Kyber-1024 (256-bit security target)
+- `presets/dilithium2.json` — Dilithium2
+- `presets/falcon512.json` — Falcon-512
+- `presets/falcon1024.json` — Falcon-1024
 
 ## Usage
 
 ```bash
+# Test with small/fast examples first
+python cli.py presets/test-tiny.json
+python cli.py presets/test-small.json
+
+# Run actual cryptographic parameter sets
 python cli.py presets/kyber512.json
 python cli.py presets/hqc128.json
-python cli.py presets/mceliece348864.json
+python cli.py presets/bike-l1.json
 ```
 
 The CLI prints a normalized JSON with the best attack and `log2_cost`.
@@ -97,10 +121,39 @@ The CLI prints a normalized JSON with the best attack and `log2_cost`.
 
 - Python 3.10+
 - For lattice back-end: SageMath + `vendors/lattice-estimator`
-- For code-based back-end: CAT (`CAT_BIN` may override the CLI path; defaults to `vendors/cat/cat.py`).
+- For code-based back-end: CAT with Docker (recommended) or manual install
+- Docker (recommended for CAT to avoid complex dependencies)
+
+## How CAT Works
+
+**CAT (Cryptographic Attack Tester)** is a tool by Daniel J. Bernstein for analyzing code-based cryptosystem security. Here's how our integration works:
+
+### Parameter Constraints
+CAT has specific constraints on code parameters:
+- **Input**: You provide `(n, k, t)` where n=code length, k=info length, t=error weight  
+- **CAT's internal logic**: Uses `(N, K, W)` where `K = N - ceil(log2(N)) * W`
+- **Mapping**: Our wrapper maps your `t → W` and lets CAT calculate its own `K`
+
+### Attack Flow
+1. **`problemparams`**: CAT finds valid `(N,K,W)` combinations for your `N` and `W`
+2. **`searchparams`**: CAT optimizes attack parameters for ISD (Information Set Decoding)  
+3. **`circuitcost`**: CAT estimates the circuit complexity (in ROPs - Random Oracle Primes)
+
+### Example
+```bash
+Input: {"n": 64, "k": 32, "t": 3}
+CAT uses: N=64, K=46, W=3  # K calculated by CAT's formula
+Output: ~12,090 ROPs (2^13.6 complexity)
+```
+
+### Limitations
+- CAT only supports specific code families (uniformmatrix problem)
+- Your desired `k` may differ from CAT's calculated `K` due to constraints
+- CAT is optimized for research scenarios, not arbitrary parameter sets
 
 ## Roadmap
 
-- Proper MLWE→LWE mapping with exact Kyber noise parameters.
-- Richer attack set selection and model flags.
-- Dockerized runners for strict reproducibility.
+- Proper MLWE→LWE mapping with exact Kyber noise parameters
+- Richer attack set selection and model flags  
+- Support for more flexible code parameters in CAT
+- Additional code-based cryptosystem families
