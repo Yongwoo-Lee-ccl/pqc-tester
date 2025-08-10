@@ -35,6 +35,17 @@ def run_estimator(params: dict) -> dict:
     if problem in ("RLWE","MLWE"):
         lwe = _mlwe_to_lwe(params)
         lwe_params_str = f"LWE.Parameters(n={lwe['n']}, q={lwe['q']}, Xs={lwe['Xs_str']}, Xe={lwe['Xe_str']})"
+    elif problem == "NTRU":
+        n = int(params.get("n", 512))
+        q = int(params.get("q", 12289))
+        
+        # Check if this is Falcon (NTRU-based signature)
+        if params.get("scheme_name") == "falcon":
+            sigma = float(params.get("sigma", 1.17))  # Falcon's signature standard deviation
+            lwe_params_str = f"LWE.Parameters(n={n}, q={q}, Xs=ND.DiscreteGaussian({sigma}), Xe=ND.DiscreteGaussian({sigma}))"
+        else:
+            # Standard NTRU with ternary secrets
+            lwe_params_str = f"LWE.Parameters(n={n}, q={q}, Xs=ND.UniformMod(3), Xe=ND.UniformMod(3))"
     else:
         lwe = {"n": int(params["n"]), "q": int(params["q"]), "alpha": float(params.get("alpha", 0.005))}
         lwe_params_str = f"LWE.Parameters(n={lwe['n']}, q={lwe['q']}, Xs=ND.DiscreteGaussianAlpha({lwe['alpha']}, {lwe['q']}), Xe=ND.DiscreteGaussianAlpha({lwe['alpha']}, {lwe['q']}))"

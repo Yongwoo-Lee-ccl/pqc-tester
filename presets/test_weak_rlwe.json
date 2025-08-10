@@ -1,0 +1,11 @@
+{
+  "kind": "lattice",
+  "label": "Weak-RLWE-Test",
+  "params": {
+    "problem": "RLWE",
+    "n": 64,
+    "q": 4503599627370496,
+    "eta1": 2,
+    "eta2": 2
+  }
+}

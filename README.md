@@ -24,10 +24,23 @@ pqc-tester/
 pip install -e .
 ```
 
-### Bring the vendors (as submodules)
+### Bring the vendors
+
+#### CAT (Code Attack Tool)
+Download and install CAT from https://cat.cr.yp.to/software.html:
 
 ```bash
-git submodule add https://cat.cr.yp.to vendors/cat
+# Visit https://cat.cr.yp.to/software.html to download the latest version
+# Extract to vendors/cat/ directory:
+# tar -xzf cryptattacktester-YYYYMMDD.tar.gz
+# mv cryptattacktester-YYYYMMDD vendors/cat
+# 
+# The framework expects cat.py to be at vendors/cat/cat.py
+# Or set CAT_BIN environment variable to point to your CAT installation
+```
+
+#### Lattice Estimator
+```bash
 git submodule add https://github.com/malb/lattice-estimator vendors/lattice-estimator
 git submodule update --init --recursive
 ```

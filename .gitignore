@@ -5,3 +5,6 @@ __pycache__/
 .env/
 .sage/
 *.egg-info/
+
+# Vendor software installations (user-installed)
+vendors/cat/

@@ -23,6 +23,9 @@ class LatticeParams(BaseModel):
     eta2: Optional[int] = None
     du: Optional[int] = None
     dv: Optional[int] = None
+    # Falcon/NTRU-specific parameters
+    sigma: Optional[float] = None  # Gaussian standard deviation
+    scheme_name: Optional[str] = None  # "falcon" for Falcon variants
 
 class InputSpec(BaseModel):
     kind: SchemeKind

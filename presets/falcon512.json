@@ -1,0 +1,14 @@
+{
+  "kind": "lattice",
+  "label": "Falcon-512",
+  "params": {
+    "problem": "NTRU",
+    "scheme_name": "falcon",
+    "n": 512,
+    "q": 12289,
+    "sigma": 1.17,
+    "pk_bytes": 897,
+    "sk_bytes": 1281,
+    "sig_bytes": 690
+  }
+}
