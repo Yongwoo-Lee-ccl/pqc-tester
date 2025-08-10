@@ -1,0 +1,18 @@
+{
+    "kind": "lattice",
+    "label": "FireSaber-default",
+    "params": {
+        "problem": "MLWE",
+        "module_k": 4,
+        "n": 256,
+        "q": 8192,
+        "Xs": {
+            "type": "CenteredBinomial",
+            "eta": 3
+        },
+        "Xe": {
+            "type": "UniformMod",
+            "q_noise": 8
+        }
+    }
+}

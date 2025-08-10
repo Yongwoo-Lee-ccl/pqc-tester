@@ -1,0 +1,9 @@
+{
+    "kind": "code",
+    "label": "Classic-McEliece-348864",
+    "params": {
+        "n": 3488,
+        "k": 2720,
+        "t": 64
+    }
+}
