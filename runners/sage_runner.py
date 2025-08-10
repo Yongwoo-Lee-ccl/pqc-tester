@@ -1,4 +1,3 @@
-
 import subprocess, json, tempfile, os, textwrap
 
 SAGE = os.environ.get("SAGE_BIN", "sage")
@@ -8,15 +7,34 @@ def _mlwe_to_lwe(params: dict):
     n = int(params.get("n", 256))
     k = int(params.get("module_k", 2) or 1)
     q = int(params.get("q", 3329))
-    eta1 = int(params.get("eta1", 3))
-    eta2 = int(params.get("eta2", 2))
-    return {"n": n*k, "q": q, "eta1": eta1, "eta2": eta2}
+
+    def parse_noise(noise_params):
+        if "type" in noise_params:
+            if noise_params["type"] == "CenteredBinomial":
+                return f"ND.CenteredBinomial({noise_params['eta']})"
+            elif noise_params["type"] == "UniformMod":
+                return f"ND.UniformMod({noise_params['q_noise']})"
+        # Fallback for old format
+        return f"ND.CenteredBinomial({noise_params.get('eta', 2)})"
+
+
+    if "Xs" in params and isinstance(params["Xs"], dict):
+        Xs_str = parse_noise(params["Xs"])
+        Xe_str = parse_noise(params["Xe"])
+    else: # old format
+        eta1 = int(params.get("eta1", 3))
+        eta2 = int(params.get("eta2", 2))
+        Xs_str = f"ND.CenteredBinomial({eta1})"
+        Xe_str = f"ND.CenteredBinomial({eta2})"
+
+
+    return {"n": n*k, "q": q, "Xs_str": Xs_str, "Xe_str": Xe_str}
 
 def run_estimator(params: dict) -> dict:
     problem = (params.get("problem") or "RLWE").upper()
     if problem in ("RLWE","MLWE"):
         lwe = _mlwe_to_lwe(params)
-        lwe_params_str = f"LWE.Parameters(n={lwe['n']}, q={lwe['q']}, Xs=ND.CenteredBinomial({lwe['eta1']}), Xe=ND.CenteredBinomial({lwe['eta2']}))"
+        lwe_params_str = f"LWE.Parameters(n={lwe['n']}, q={lwe['q']}, Xs={lwe['Xs_str']}, Xe={lwe['Xe_str']})"
     else:
         lwe = {"n": int(params["n"]), "q": int(params["q"]), "alpha": float(params.get("alpha", 0.005))}
         lwe_params_str = f"LWE.Parameters(n={lwe['n']}, q={lwe['q']}, Xs=ND.DiscreteGaussianAlpha({lwe['alpha']}, {lwe['q']}), Xe=ND.DiscreteGaussianAlpha({lwe['alpha']}, {lwe['q']}))"
