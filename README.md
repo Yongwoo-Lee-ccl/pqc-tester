@@ -36,7 +36,16 @@ pip install -e .
 
 ### Bring the vendors
 
-#### CAT (Code Attack Tool)
+#### 1. Lattice Estimator
+```bash
+git submodule add https://github.com/malb/lattice-estimator vendors/lattice-estimator
+git submodule update --init --recursive
+```
+
+`runners/sage_runner.py` expects `sage` in PATH and `LATTICE_ESTIMATOR_PATH` pointing to `vendors/lattice-estimator` (default already points there).
+
+
+#### 2. CAT (CryptAttackTester)
 
 **Recommended: Docker Setup (Easiest)**
 ```bash
@@ -83,14 +92,6 @@ brew install gmp mpfi
 ```
 
 By default, the framework uses Docker. Set `CAT_BIN` environment variable to override.
-
-#### Lattice Estimator
-```bash
-git submodule add https://github.com/malb/lattice-estimator vendors/lattice-estimator
-git submodule update --init --recursive
-```
-
-`runners/sage_runner.py` expects `sage` in PATH and `LATTICE_ESTIMATOR_PATH` pointing to `vendors/lattice-estimator` (default already points there).
 
 ## Presets
 
@@ -152,7 +153,7 @@ The CLI prints a normalized JSON with the best attack, `log2_cost`, and metadata
 
 ## How CAT Works
 
-**CAT (Cryptographic Attack Tester)** is a tool by Daniel J. Bernstein for analyzing code-based cryptosystem security. Here's how our integration works:
+**CAT (Cryptographic Attack Tester)** is a tool by Bernstein and Chou for analyzing code-based cryptosystem security. Here's how our integration works:
 
 ### Parameter Constraints & Limitations
 
@@ -189,13 +190,11 @@ Output includes: attack name, cost, and metadata about all variants tested
 - **Code families**: CAT only supports the "uniformmatrix" problem type (random linear codes)
 - **Parameter flexibility**: Your desired `k` may differ from CAT's calculated `K` due to rate constraints  
 - **Research focus**: CAT is optimized for cryptanalytic research, not arbitrary parameter validation
-- **Attack scope**: Focuses on ISD variants; does not cover all possible code-breaking approaches
+- **Attack scope**: Focuses on ISD variants; does not cover all possible cryptanalysis approaches
 - **Classical security**: Provides classical complexity estimates; quantum impact requires separate analysis
 
-**Academic References**: 
-- **CAT (Code-based cryptanalysis)**: Bernstein, D.J. "cryptattacktester software" (2023). https://cat.cr.yp.to/
-- **Section 4.6 parameter constraints** are documented in the CAT technical specifications
-- The underlying ISD algorithms and complexity analysis are described in the CAT documentation and related papers on code-based cryptanalysis available at https://cat.cr.yp.to/papers.html
+**References**: 
+- **CAT (Code-based cryptanalysis)**: BDaniel J. Bernstein, Tung Chou. "CryptAttackTester: high-assurance attack analysis." Crypto 2024.
 - **Lattice Estimator (Lattice-based cryptanalysis)**: Albrecht, M.R., Player, R., and Scott, S. "On the concrete hardness of Learning with Errors" (2015). Available at https://github.com/malb/lattice-estimator
 
 ## Roadmap
