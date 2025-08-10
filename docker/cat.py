@@ -52,14 +52,14 @@ def run_cat_attack(params):
         else:
             raise RuntimeError(f"Invalid problemparams output: {first_line}")
         
-        # Test multiple ISD attack variants (ISD0, ISD1, ISD2)
+        # Test multiple ISD attack variants with descriptive names
         attack_variants = [
-            ('attack=isd0,P=0,L=0,FW=1', 'isd0'),
-            ('attack=isd0,L=0,FW=1', 'isd0'),
-            ('attack=isd0,FW=1', 'isd0'),
-            ('attack=isd1,FW=1', 'isd1'), 
-            ('attack=isd2,CP=1,CS=0,FW=1', 'isd2'),
-            ('attack=isd2,CP=0,CS=1,FW=1', 'isd2'),
+            ('attack=isd0,P=0,L=0,FW=1', 'isd0:Prange and Lee-Brickel'),
+            ('attack=isd0,L=0,FW=1', 'isd0:Prange and Lee-Brickel'),
+            ('attack=isd0,FW=1', 'isd0:Prange and Lee-Brickel'),
+            ('attack=isd1,FW=1', 'isd1:Stern and Dumer'), 
+            ('attack=isd2,CP=1,CS=0,FW=1', 'isd2: MMT and BJMM'),
+            ('attack=isd2,CP=0,CS=1,FW=1', 'isd2: MMT and BJMM'),
         ]
         
         best_attack = None
@@ -127,7 +127,7 @@ def run_cat_attack(params):
         # Use the best attack found, or fallback
         if best_attack is None:
             rop_cost = 2**64  # Reasonable default for small parameters
-            best_attack_name = 'isd0'
+            best_attack_name = 'isd0_fallback'
         else:
             rop_cost = best_cost
         
