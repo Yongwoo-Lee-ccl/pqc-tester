@@ -1,0 +1,20 @@
+{
+  "kind": "lattice",
+  "label": "Dilithium3",
+  "params": {
+    "problem": "MLWE",
+    "scheme_name": "dilithium",
+    "n": 256,
+    "q": 8380417,
+    "module_k": 6,
+    "module_l": 5,
+    "eta": 4,
+    "tau": 49,
+    "beta": 196,
+    "gamma1": 523776,
+    "gamma2": 95232,
+    "pk_bytes": 1952,
+    "sk_bytes": 4000,
+    "sig_bytes": 3293
+  }
+}

@@ -1,13 +1,27 @@
 
-# Placeholder runner: adapt to CAT's actual CLI once integrated.
-# For now, we mimic a plausible output dict to exercise the pipeline.
+"""Runner for the CAT (code-based attack tool) CLI."""
+
+import json
+import os
+import shlex
+import subprocess
+import tempfile
+
+CAT_BIN = os.environ.get("CAT_BIN", "python3 vendors/cat/cat.py")
+
+
 def run_cat(params: dict) -> dict:
-    # TODO: translate params -> CAT input & call external tool
-    # The following mock is only for scaffolding tests.
-    return {
-        "attacks": {
-            "isd-bkz-hybrid": {"rop": 2.3e45, "succ": 0.51},
-            "stern": {"rop": 1.1e46, "succ": 0.50}
-        },
-        "meta": {"model": "CAT-mock-0.1"}
-    }
+    cmd = shlex.split(CAT_BIN)
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump(params, f)
+        tmp = f.name
+    try:
+        out = subprocess.run(cmd + [tmp], capture_output=True, text=True)
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+    if out.returncode != 0:
+        raise RuntimeError(out.stderr or out.stdout)
+    return json.loads(out.stdout.strip() or "{}")
