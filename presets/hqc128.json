@@ -1,0 +1,17 @@
+{
+  "kind": "code",
+  "label": "HQC-128-default",
+  "params": {
+    "code_family": "hqc",
+    "n": 17669,
+    "n1": 46,
+    "n2": 384,
+    "w": 66,
+    "wr": 75,
+    "we": 75,
+    "pk_bytes": 2249,
+    "sk_bytes": 56,
+    "ct_bytes": 4497,
+    "target_dfp": "2^-128"
+  }
+}

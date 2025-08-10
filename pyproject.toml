@@ -1,0 +1,13 @@
+
+[project]
+name = "sec-framework"
+version = "0.1.0"
+description = "Unified security estimator wrapper for code- and lattice-based crypto (CAT + lattice-estimator)"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.6.0",
+    "typer>=0.9.0",
+]
+
+[project.scripts]
+sec-estimate = "cli:app"

@@ -1,0 +1,15 @@
+{
+  "kind": "lattice",
+  "label": "Kyber512-default",
+  "params": {
+    "problem": "MLWE",
+    "module_k": 2,
+    "n": 256,
+    "q": 3329,
+    "eta1": 3,
+    "eta2": 2,
+    "du": 10,
+    "dv": 4,
+    "target_delta": "2^-139"
+  }
+}
