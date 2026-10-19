@@ -2,19 +2,33 @@
 [project]
 name = "pqc-tester"
 version = "0.1.0"
-description = "Unified security estimator wrapper for code- and lattice-based crypto (CAT + lattice-estimator)"
+description = "Unified security estimator wrapper (CAT, lattice-estimator, CryptographicEstimators)"
 requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.6.0",
     "typer>=0.9.0",
 ]
 
+[project.optional-dependencies]
+crypto-estimators = ["cryptographic-estimators==2.1.1"]
+dev = ["pytest>=8"]
+
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+py-modules = ["cli"]
+
 [tool.setuptools.packages.find]
 include = ["core*", "runners*", "adapters*", "presets*"]
 
+[tool.setuptools.package-data]
+presets = ["*.json"]
+
 [project.scripts]
 sec-estimate = "cli:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires the optional CryptographicEstimators backend"]

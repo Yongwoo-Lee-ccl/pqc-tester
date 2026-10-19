@@ -1,0 +1,5 @@
+{
+  "kind": "mayo",
+  "label": "Toy MAYO (not a secure parameter set)",
+  "params": {"n": 16, "m": 12, "o": 4, "k": 2, "q": 16}
+}
