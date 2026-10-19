@@ -1,0 +1,5 @@
+{
+  "kind": "mq",
+  "label": "Toy MQ system (not a secure parameter set)",
+  "params": {"n": 15, "m": 17, "q": 2}
+}

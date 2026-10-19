@@ -1,0 +1,5 @@
+{
+  "kind": "uov",
+  "label": "Toy UOV (not a secure parameter set)",
+  "params": {"n": 24, "m": 10, "q": 2}
+}

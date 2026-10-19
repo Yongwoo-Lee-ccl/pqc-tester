@@ -4,7 +4,7 @@ import math
 from core.models import InputSpec
 from core.router import route
 
-app = typer.Typer(help="Unified estimator CLI (code-based via CAT, lattice via lattice-estimator).")
+app = typer.Typer(help="Unified estimator CLI (CAT, lattice-estimator, CryptographicEstimators: MQ/UOV/MAYO).")
 
 def validate_code_params(params):
     """Validate code-based parameters against CAT constraints (section 4.6)."""

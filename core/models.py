@@ -2,7 +2,7 @@
 from pydantic import BaseModel
 from typing import Literal, Optional, Dict, Any
 
-SchemeKind = Literal["code", "lattice"]
+SchemeKind = Literal["code", "lattice", "mq", "uov", "mayo"]
 
 class CodeParams(BaseModel):
     n: int
@@ -33,9 +33,11 @@ class InputSpec(BaseModel):
     params: Dict[str, Any]
 
 class AttackCost(BaseModel):
-    rops: float
+    # Some estimators return logarithms too large to expand into a float.
+    rops: Optional[float] = None
     log2_cost: float
     mem_bytes: Optional[int] = None
+    log2_memory: Optional[float] = None
     success_prob: Optional[float] = None
     time_model: Optional[str] = None
 
