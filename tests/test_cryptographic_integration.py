@@ -2,6 +2,7 @@
 
 import json
 import math
+import os
 from pathlib import Path
 
 import pytest
@@ -18,11 +19,27 @@ pytestmark = pytest.mark.integration
 PRESETS = Path(__file__).resolve().parents[1] / "presets"
 
 
-@pytest.mark.parametrize("kind, estimator", [
-    ("mq", ce.MQEstimator), ("uov", ce.UOVEstimator), ("mayo", ce.MAYOEstimator),
+REAL_PRESET_MARK = pytest.mark.skipif(
+    os.environ.get("PQC_TEST_REAL_PRESETS") != "1",
+    reason="Set PQC_TEST_REAL_PRESETS=1 for full-size candidate comparisons",
+)
+
+
+@pytest.mark.parametrize("preset, kind, estimator", [
+    ("mq-small", "mq", ce.MQEstimator),
+    ("uov-small", "uov", ce.UOVEstimator),
+    ("mayo-small", "mayo", ce.MAYOEstimator),
+    *[
+        pytest.param(preset, kind, estimator, marks=REAL_PRESET_MARK)
+        for kind, estimator, names in [
+            ("uov", ce.UOVEstimator, ["uov-ip", "uov-is", "uov-iii", "uov-v"]),
+            ("mayo", ce.MAYOEstimator, ["mayo1", "mayo2", "mayo3", "mayo5"]),
+        ]
+        for preset in names
+    ],
 ])
-def test_preset_cli_matches_upstream(kind, estimator):
-    path = PRESETS / f"{kind}-small.json"
+def test_preset_cli_matches_upstream(preset, kind, estimator):
+    path = PRESETS / f"{preset}.json"
     spec = json.loads(path.read_text())
     upstream = estimator(**spec["params"]).estimate()
     available = {

@@ -1,0 +1,5 @@
+{
+  "kind": "mayo",
+  "label": "MAYO-5 (round 3, NIST category 5 target)",
+  "params": {"n": 154, "m": 142, "o": 12, "k": 12, "q": 16}
+}

@@ -105,6 +105,9 @@ python cli.py presets/uov-small.json
 python cli.py presets/mayo-small.json
 # The installed entry point accepts the same spec files:
 sec-estimate presets/uov-small.json
+# Published NIST additional-signature candidate parameters:
+sec-estimate presets/uov-ip.json
+sec-estimate presets/mayo1.json
 ```
 
 This uses the local [CryptographicEstimators Python library](https://github.com/Crypto-TII/CryptographicEstimators),
@@ -185,7 +188,44 @@ with CAT circuit counts or lattice-estimator operation counts.
 - `presets/falcon512.json` — Falcon-512
 - `presets/falcon1024.json` — Falcon-1024
 
-### Multivariate examples (routed to CryptographicEstimators)
+### Multivariate candidate parameter sets (routed to CryptographicEstimators)
+
+UOV and MAYO are [round-3 candidates in NIST's additional digital-signature process](https://csrc.nist.gov/News/2026/nist-advances-9-candidates-to-the-3rd-round-of-pqc).
+These are published candidate parameter sets, not finalized NIST standards.
+The category column records the submitters' security target, not a result or
+guarantee from this estimator.
+
+| Preset | Candidate parameter set | NIST category target | `n` | `m` | `q` | `o` | `k` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `presets/uov-ip.json` | UOV-Ip | 1 | 119 | 45 | 256 | — | — |
+| `presets/uov-is.json` | UOV-Is | 1 | 160 | 64 | 16 | — | — |
+| `presets/uov-iii.json` | UOV-III | 3 | 193 | 72 | 256 | — | — |
+| `presets/uov-v.json` | UOV-V | 5 | 259 | 96 | 256 | — | — |
+| `presets/mayo1.json` | MAYO-1 | 1 | 88 | 80 | 16 | 8 | 10 |
+| `presets/mayo2.json` | MAYO-2 | 1 | 86 | 64 | 16 | 13 | 5 |
+| `presets/mayo3.json` | MAYO-3 | 3 | 118 | 108 | 16 | 10 | 11 |
+| `presets/mayo5.json` | MAYO-5 | 5 | 154 | 142 | 16 | 12 | 12 |
+
+Parameter provenance, checked on **2026-10-19**:
+
+- UOV: the submitters' [parameter table](https://github.com/pqov/pqov/blob/fac2ec1fe6d8ea508eab4b98eb5341e1eed930a4/README.md)
+  and [parameter definitions](https://github.com/pqov/pqov/blob/fac2ec1fe6d8ea508eab4b98eb5341e1eed930a4/src/params.h),
+  pinned at `fac2ec1fe6d8ea508eab4b98eb5341e1eed930a4`.
+  These use the round-3 dimensions, rather than the earlier Ip `(112,44)`,
+  III `(184,72)`, and V `(244,96)` values. The classic/pkc/pkc+skc variants
+  share each mathematical parameter set, so they do not need duplicate presets.
+- MAYO: the submitters' [parameter table](https://github.com/PQCMayo/MAYO-C/blob/74de637a7c4a7f9fafa888183bc05f5cf920cd2d/README.md)
+  and [parameter definitions](https://github.com/PQCMayo/MAYO-C/blob/74de637a7c4a7f9fafa888183bc05f5cf920cd2d/include/mayo_constants.h),
+  pinned at `74de637a7c4a7f9fafa888183bc05f5cf920cd2d`.
+
+These files pass the published problem dimensions to CryptographicEstimators
+2.1.1 with its default cost models and no excluded attacks. They estimate
+attack costs, rather than implement key generation or signatures. The pinned
+backend's models can predate later cryptanalysis or specification changes;
+loading a newer parameter set does not update those models. Full-size estimates
+can take substantially longer than the small examples below.
+
+### Multivariate execution examples
 
 - `presets/mq-small.json` — MQ with 15 variables, 17 equations over GF(2)
 - `presets/uov-small.json` — UOV with 24 total variables, 10 oil variables over GF(2)
@@ -241,7 +281,15 @@ python -m pytest -q
 
 Tests cover routing, validation, unavailable algorithms, cost units, large
 logarithms, memory bounds, and CLI results compared with the upstream
-`estimate()` API for all three multivariate presets. Without the optional
+`estimate()` API for all three small multivariate presets. To also compare the
+eight full-size candidate presets with the upstream API, run:
+
+```bash
+PQC_TEST_REAL_PRESETS=1 python -m pytest -q
+```
+
+Full-size comparisons are skipped by default to keep routine tests fast.
+Without the optional
 backend, integration tests are skipped and wrapper tests still run. CI tests
 both installation modes on Python 3.10 and 3.12. CAT/SageMath execution requires
 their separate environments and is not part of this test suite.

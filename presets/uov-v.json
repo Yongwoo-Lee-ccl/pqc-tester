@@ -1,0 +1,5 @@
+{
+  "kind": "uov",
+  "label": "UOV-V (round 3, NIST category 5 target)",
+  "params": {"n": 259, "m": 96, "q": 256}
+}
